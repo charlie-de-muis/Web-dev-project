@@ -20,6 +20,25 @@ public class LoginService : ILoginService
     public LoginStatus CheckPassword(string username, string inputPassword)
     {
         // TODO: Make this method check the password with what is in the database
-        return LoginStatus.IncorrectPassword;
+        // Bente mee bezig geweest
+        Console.WriteLine("Please enter username: ");
+        string username = Console.ReadLine();
+        Console.WriteLine("Please enter password");
+        string inputPassword = Console.ReadLine();
+
+        // Check if the input password matches the stored hashed password
+        bool isPasswordValid = EncryptionHelper.VerifyPassword(inputPassword, admin.Password);
+
+        if (username == Admin.UserName && isPasswordValid == true)
+        {
+            Console.WriteLine("You've logged in successfully!")
+            return true;
+            // log in idk how to implement
+        }
+        else
+        {            
+            Console.WriteLine("Password or Username is incorrect");
+            return LoginStatus.IncorrectPassword;
+        }
     }
 }
