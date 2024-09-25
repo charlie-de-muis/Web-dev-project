@@ -1,0 +1,20 @@
+@{
+    ViewData["Title"] = "Login";
+}
+
+<!--Main div with ID root, this where React will load the App-->
+@* <div id="root"></div> *@
+
+@model StarterKit.Models.Login
+
+<div class="text-center">
+    <h1 class="display-4">Log in:</h1>
+</div>
+
+<form asp-action="Login" asp-controller="Home">
+    <label for="username">Username:</label><br>
+    <input type="username" id="username" asp-for="UserName"></input><br>
+    <label for="password">Password:</label><br>
+    <input type="password" id="password" asp-for="PassWord"></input><br><br>
+    <button type="button">OK</button>
+</form>
