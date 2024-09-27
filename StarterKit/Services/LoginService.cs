@@ -1,3 +1,4 @@
+using SQLitePCL;
 using StarterKit.Models;
 using StarterKit.Utils;
 
@@ -19,7 +20,23 @@ public class LoginService : ILoginService
 
     public LoginStatus CheckPassword(string username, string inputPassword)
     {
-        // TODO: Make this method check the password with what is in the database
-        return LoginStatus.IncorrectPassword;
+        // Retrieve the admin with the specified username
+        var admin = _context.Admin.SingleOrDefault(a => a.UserName == username);
+        
+        // Check if the admin with the given username exists
+        if (admin == null)
+        {
+            return LoginStatus.IncorrectUsername; // Username doesn't exist in the database
+        }
+
+        // Compare the provided password with the stored password
+        if (admin.Password == inputPassword)
+        {
+            return LoginStatus.Success; // Password matches
+        }
+        else
+        {
+            return LoginStatus.IncorrectPassword; // Password doesn't match
+        }
     }
 }

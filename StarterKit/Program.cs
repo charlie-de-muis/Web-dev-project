@@ -49,6 +49,8 @@ namespace StarterKit
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
 
+
+            app.Urls.Add("http://localhost:5097");
             app.Run();
 
         }
