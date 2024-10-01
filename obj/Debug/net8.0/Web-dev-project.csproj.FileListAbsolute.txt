@@ -1,0 +1,5 @@
+C:\Users\bente\Documents\GitHub\Web-dev-project\obj\Debug\net8.0\Web-dev-project.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\bente\Documents\GitHub\Web-dev-project\obj\Debug\net8.0\Web-dev-project.AssemblyInfoInputs.cache
+C:\Users\bente\Documents\GitHub\Web-dev-project\obj\Debug\net8.0\Web-dev-project.AssemblyInfo.cs
+C:\Users\bente\Documents\GitHub\Web-dev-project\obj\Debug\net8.0\Web-dev-project.csproj.CoreCompileInputs.cache
+C:\Users\bente\Documents\GitHub\Web-dev-project\obj\Debug\net8.0\Web-dev-project.sourcelink.json
