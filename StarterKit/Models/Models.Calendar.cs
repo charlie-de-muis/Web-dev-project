@@ -1,24 +1,18 @@
 namespace StarterKit.Models
 {
-    public class User
-    {
-        public int UserId { get; set; }
+public class User
+{
+    public int UserId { get; set; }
+    public required string FirstName { get; set; }
+    public required string LastName { get; set; }
+    public required string Email { get; set; }
+    public required string Password { get; set; }
+    public required string RecuringDays { get; set; }
 
-        public required string FirstName { get; set; }
+    public required List<Attendance> Attendances { get; set; }
 
-        public required string LastName { get; set; }
-
-        public required string Email { get; set; }
-
-        public required string Password { get; set; }
-
-        // A comma sepparated string that could look like this: "mo,tu,we,th,fr"
-        public required string RecuringDays { get; set; }
-
-        public required List<Attendance> Attendances { get; set; }
-
-        public required List<Event_Attendance> Event_Attendances { get; set; }
-    }
+    public required List<Event_Attendance> Event_Attendances { get; set; }
+}
 
     public class Attendance
     {
@@ -40,7 +34,7 @@ namespace StarterKit.Models
 
     public class Event
     {
-        public int EventId { get; set; }
+        public int? EventId { get; set; }
 
         public required string Title { get; set; }
 
@@ -54,7 +48,7 @@ namespace StarterKit.Models
 
         public required string Location { get; set; }
 
-        public bool AdminApproval { get; set; }
+        public bool? AdminApproval { get; set; }
 
         public required List<Event_Attendance> Event_Attendances { get; set; }
     }

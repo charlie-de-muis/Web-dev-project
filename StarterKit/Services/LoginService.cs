@@ -39,4 +39,11 @@ public class LoginService : ILoginService
             return LoginStatus.IncorrectPassword; // Password doesn't match
         }
     }
+
+    public bool IsAdmin(string username)
+    {
+        // Retrieve the admin by username
+        var admin = _context.Admin.SingleOrDefault(a => a.UserName == username);
+        return admin != null; // Returns true if admin exists
+    }
 }

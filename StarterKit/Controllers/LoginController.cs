@@ -17,20 +17,24 @@ public class LoginController : Controller
         _loginService = loginService;
     }
 
-    [HttpPost("Login")]
-    public IActionResult Login([FromBody] LoginBody loginBody)
-    {
-        LoginStatus status =  _loginService.CheckPassword(loginBody.Username, loginBody.Password);
-        if (status == LoginStatus.IncorrectUsername){return Unauthorized("Incorrect username");}
-        else if (status == LoginStatus.IncorrectPassword){return Unauthorized("Incorrect password");}
+[HttpPost("Login")]
+public IActionResult Login([FromBody] LoginBody loginBody)
+{
+    LoginStatus status = _loginService.CheckPassword(loginBody.Username, loginBody.Password);
+    
+    if (status == LoginStatus.IncorrectUsername) return Unauthorized("Incorrect username");
+    if (status == LoginStatus.IncorrectPassword) return Unauthorized("Incorrect password");
 
-        else if (status == LoginStatus.Success)
-        {
-            HttpContext.Session.SetString("Username", loginBody.Username);
-            return Ok($"Log in succesful for {loginBody.Username}");
-        }
-        else{return Unauthorized("Unknown error");}
+    if (status == LoginStatus.Success)
+    {
+        bool isAdmin = _loginService.IsAdmin(loginBody.Username);        
+        HttpContext.Session.SetString("Username", loginBody.Username);
+        HttpContext.Session.SetBool("IsAdmin", isAdmin); // Store the admin status
+        return Ok($"Log in successful for {loginBody.Username}");
     }
+
+    return Unauthorized("Unknown error");
+}
 
     [HttpGet("IsAdminLoggedIn")]
     public IActionResult IsAdminLoggedIn()
