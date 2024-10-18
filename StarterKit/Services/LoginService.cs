@@ -30,7 +30,7 @@ public class LoginService : ILoginService
         }
 
         // Compare the provided password with the stored password
-        if (admin.Password == inputPassword)
+        if (admin.Password == EncryptionHelper.EncryptPassword(inputPassword))
         {
             return LoginStatus.Success; // Password matches
         }
