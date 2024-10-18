@@ -32,7 +32,7 @@ namespace StarterKit.Controllers
                 return Unauthorized();
             }
 
-            // Fetch the user from the database (replace with your actual user fetching logic)
+            // Fetch the user from the database (replace with actual user fetching logic)
             var user = await _dbContext.User.FindAsync(request.UserId);
             if (user == null)
             {
