@@ -30,7 +30,7 @@ public class LoginService : ILoginService
         }
 
         // Compare the provided password with the stored password
-        if (admin.Password == inputPassword)
+        if (admin.Password == EncryptionHelper.EncryptPassword(inputPassword))
         {
             return LoginStatus.Success; // Password matches
         }
@@ -38,5 +38,12 @@ public class LoginService : ILoginService
         {
             return LoginStatus.IncorrectPassword; // Password doesn't match
         }
+    }
+
+    public bool IsAdmin(string username)
+    {
+        // Retrieve the admin by username
+        var admin = _context.Admin.SingleOrDefault(a => a.UserName == username);
+        return admin != null; // Returns true if admin exists
     }
 }

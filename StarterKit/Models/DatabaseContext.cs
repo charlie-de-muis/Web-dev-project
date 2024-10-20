@@ -19,7 +19,6 @@ namespace StarterKit.Models
         // public DbSet<Venue> Venue { get; set; }
 
         //Tables for the event calendar case
-
         public DbSet<User> User { get; set; }
         public DbSet<Attendance> Attendance { get; set; }
         public DbSet<Event_Attendance> Event_Attendance { get; set; }
