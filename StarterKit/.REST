@@ -21,7 +21,7 @@ PUT http://localhost:5097/api/v1/events/create
 Content-Type: application/json
 
 {
-    "EventId" : 12345,
+    "EventId" : 123457,
     "Title" : "School",
     "Description" : "School",
     "EventDate" : "2026-10-18",
@@ -79,7 +79,7 @@ POST http://localhost:5097/api/v1/attendance/attend
 Content-Type: application/json
 
 {
-    "UserId" : 2,
+    "UserId" : 1,
     "EventId" : 12345
 }
 
