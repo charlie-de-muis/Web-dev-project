@@ -18,6 +18,8 @@ public class LoginService : ILoginService
         _context = context;
     }
 
+    private readonly Dictionary<string, User> _users = new Dictionary<string, User>();
+
     public LoginStatus CheckPassword(string username, string inputPassword)
     {
         // Retrieve the admin with the specified username
@@ -46,4 +48,27 @@ public class LoginService : ILoginService
         var admin = _context.Admin.SingleOrDefault(a => a.UserName == username);
         return admin != null; // Returns true if admin exists
     }
+
+    public RegistrationStatus RegisterUser(string username, string password, bool isAdmin)
+    {
+        if (_users.ContainsKey(username))
+            return RegistrationStatus.UserAlreadyExists;
+
+        var newUser = new User
+        {
+            Username = username,
+            Password = password,
+            IsAdmin = isAdmin
+        };
+
+        _users.Add(username, newUser);
+        return RegistrationStatus.Success;
+    }
+}
+
+public class User
+{
+    public string Username { get; set; }
+    public string Password { get; set; }
+    public bool IsAdmin { get; set; }
 }
