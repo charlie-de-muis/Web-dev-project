@@ -94,3 +94,13 @@ Content-Type: application/json
 ### Remove user from event
 DELETE http://localhost:5097/api/v1/attendance/cancel/12345
 Content-Type: application/json
+
+### OFFICE ATTENDANCE CONTROLLER
+### Update Attendance Request
+PUT http://localhost:5097/api/v1/officeattendance/update
+Content-Type: application/json
+
+{
+  "currentEventId": 67890,
+  "newEventId": 12345
+}
