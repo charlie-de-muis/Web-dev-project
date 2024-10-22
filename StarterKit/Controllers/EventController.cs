@@ -87,4 +87,23 @@ public class EventController : Controller
         await _context.SaveChangesAsync();
         return Ok();
     }
+
+    [HttpPost("StarReview/{id}")]
+    public async Task<IActionResult> StarReview([FromBody] ReviewMap reviewmap)
+    {
+        if (reviewmap != null && reviewmap.Review != null && reviewmap.Stars > 0)
+    {
+        return Ok($"{reviewmap.Stars} Stars: {reviewmap.Review}");
+    }
+        else
+        {
+            return BadRequest("No review found.");
+        }
+    }
+    public class ReviewMap
+    {
+        public int Stars { get; set; }
+        public string Review { get; set; }
+    }
+
 }

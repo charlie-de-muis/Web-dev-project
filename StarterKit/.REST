@@ -51,4 +51,11 @@ Content-Type: application/json
 #### Delete event
 DELETE http://localhost:5097/api/v1/events/delete/12345
 
+#### Write a review
+POST http://localhost:5097/api/v1/events/StarReview/12345
+Content-Type: application/json
 
+{
+    "stars" : 5,
+    "review": "I liked it, i would take my crush to this event."
+}
