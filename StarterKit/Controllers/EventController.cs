@@ -1,5 +1,3 @@
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using StarterKit.Models;
@@ -10,20 +8,18 @@ namespace StarterKit.Controllers;
 [Route("api/v1/Events")]
 public class EventController : Controller
 {
-    // bring in the database
     private readonly DatabaseContext _context;
+    private readonly Dictionary<int, List<string>> _eventAttendance = new Dictionary<int, List<string>>();
+    private readonly List<EventBody> _events = new List<EventBody>();
     public EventController(DatabaseContext context)
     {
         _context = context;
     }
 
-    // The Read operation needs to be a GET endpoint and must be public.
-    // This endpoint will also be used by the front-end to display an overview of events. 
     [HttpGet]
     public async Task<ActionResult<IEnumerable<string>>> GetEvents()
     {
-        // Include the reviews and attendees to the event entity in the response of the GET operation.
-        List<Event> events = _context.Event.ToList();
+        List<Event> events = await _context.Event.ToListAsync();
         List<string> txts = new List<string>();
 
         foreach (Event e in events)
@@ -32,38 +28,38 @@ public class EventController : Controller
                         $"Event name: {e.Title}  " +
                         $"Description: {e.Description}  " +
                         $"Date: {e.EventDate}  " +
-                    $"Attendances: {(e.Event_Attendances != null ? e.Event_Attendances.Select(a => a.User.FirstName + " " + a.User.LastName).ToList() : new List<string>())}  " +
-                    $"Reviews: {(e.Event_Attendances != null ? e.Event_Attendances.Select(a => a.Feedback).ToList() : new List<string>())}";
-            
+                        $"Attendances: {(e.Event_Attendances != null ? string.Join(", ", e.Event_Attendances.Select(a => a.User.FirstName + " " + a.User.LastName)) : "")}  " +
+                        $"Reviews: {(e.Event_Attendances != null ? string.Join(", ", e.Event_Attendances.Select(a => a.Feedback)) : "")}";
+
             txts.Add(txt);
         }
         return Ok(txts);
     }
-    
 
-    [HttpPut("create")]
-    public async Task<ActionResult<Event>> CreateEvent([FromBody] Event? eventItem)
+    [HttpPost("create")]
+    public async Task<ActionResult<Event>> CreateEventNow([FromBody] Event eventItem)
     {
-        if (!HttpContext.Session.GetBool("IsAdmin")) return Unauthorized("Only admins");
-        if (eventItem == null){return NotFound("Event item not found");}
-        // Add the event to the database context
+        var isAdminStr = HttpContext.Session.GetString("IsAdmin");
+        if (string.IsNullOrEmpty(isAdminStr) || !bool.Parse(isAdminStr))
+            return Unauthorized("Only admins can create events.");
+
         await _context.Event.AddAsync(eventItem);
-        
-        // Save the changes to the database
         await _context.SaveChangesAsync();
 
         return CreatedAtAction(nameof(GetEvents), new { id = eventItem.EventId }, eventItem);
     }
 
-
     [HttpPost("update/{id}")]
-    public async Task<ActionResult<Event>> UpdateEvent([FromRoute] int id, [FromBody] Event new_event)
+    public async Task<ActionResult<Event>> UpdateEventNow([FromRoute] int id, [FromBody] Event new_event)
     {
-        if (!HttpContext.Session.GetBool("IsAdmin")) return Unauthorized("Only admins");
-        Event? ThisEvent = await _context.Event.FirstOrDefaultAsync(e => e.EventId == id);
+        var isAdminStr = HttpContext.Session.GetString("IsAdmin");
+        if (string.IsNullOrEmpty(isAdminStr) || !bool.Parse(isAdminStr))
+            return Unauthorized("Only admins can update events.");
 
-        if (ThisEvent == null){return NotFound($"Event with ID: {id} not found");}
-        
+        var ThisEvent = await _context.Event.FirstOrDefaultAsync(e => e.EventId == id);
+
+        if (ThisEvent == null) return NotFound($"Event with ID: {id} not found");
+
         ThisEvent.Title = new_event.Title;
         ThisEvent.Description = new_event.Description;
         ThisEvent.EventDate = new_event.EventDate;
@@ -73,18 +69,64 @@ public class EventController : Controller
         ThisEvent.Event_Attendances = new_event.Event_Attendances;
 
         await _context.SaveChangesAsync();
-        return Ok(await _context.Event.FirstOrDefaultAsync(e => e.EventId == id));
+        return Ok(ThisEvent);
     }
 
     [HttpDelete("delete/{id}")]
-    public async Task<IActionResult> DeleteEvent([FromRoute] int id)
+    public async Task<IActionResult> DeleteEventNow([FromRoute] int id)
     {
-        if (!HttpContext.Session.GetBool("IsAdmin")) return Unauthorized("Only admins");
-        Event? delEvent = await _context.Event.FirstOrDefaultAsync(e => e.EventId == id);
-        if (delEvent == null){return NotFound($"Event with ID: {id} not found");}
+        var isAdminStr = HttpContext.Session.GetString("IsAdmin");
+        if (string.IsNullOrEmpty(isAdminStr) || !bool.Parse(isAdminStr))
+            return Unauthorized("Only admins can delete events.");
+
+        var delEvent = await _context.Event.FirstOrDefaultAsync(e => e.EventId == id);
+        if (delEvent == null) return NotFound($"Event with ID: {id} not found");
 
         _context.Event.Remove(delEvent);
         await _context.SaveChangesAsync();
         return Ok();
     }
+
+    public bool MarkUserAttendance(string username, int eventId)
+        {
+            var eventToAttend = _events.FirstOrDefault(e => e.Id == eventId);
+            if (eventToAttend == null)
+            {
+                return false; // Event not found
+            }
+
+            // Check if this event already has attendees
+            if (!_eventAttendance.ContainsKey(eventId))
+            {
+                _eventAttendance[eventId] = new List<string>(); // Initialize the attendee list if it doesn't exist
+            }
+
+            // Add the user to the list of attendees if they are not already attending
+            if (!_eventAttendance[eventId].Contains(username))
+            {
+                _eventAttendance[eventId].Add(username);
+            }
+
+            return true;
+        }
+
+        // Optionally, add a method to get the list of attendees for a specific event
+        public List<string> GetEventAttendees(int eventId)
+        {
+            if (_eventAttendance.ContainsKey(eventId))
+            {
+                return _eventAttendance[eventId];
+            }
+
+            return new List<string>(); // No attendees if the event doesn't exist or has no attendees
+        }
+}
+
+public class EventBody
+{
+    public int Id { get; set; }
+    public string Title { get; set; }
+    public string Description { get; set; }
+    public DateTime EventDate { get; set; }
+    public string Location { get; set; }
 }

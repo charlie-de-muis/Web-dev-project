@@ -4,45 +4,45 @@ using StarterKit.Models;
 using StarterKit.Services;
 
 namespace StarterKit.Controllers;
-// https://stackoverflow.com/questions/54868207/how-to-create-and-access-session-net-core-api
 
 [Route("api/v1/Login")]
 public class LoginController : Controller
 {
     private readonly ILoginService _loginService;
-    
 
     public LoginController(ILoginService loginService)
     {
         _loginService = loginService;
     }
 
-[HttpPost("Login")]
-public IActionResult Login([FromBody] LoginBody loginBody)
-{
-    LoginStatus status = _loginService.CheckPassword(loginBody.Username, loginBody.Password);
-    
-    if (status == LoginStatus.IncorrectUsername) return Unauthorized("Incorrect username");
-    if (status == LoginStatus.IncorrectPassword) return Unauthorized("Incorrect password");
-
-    if (status == LoginStatus.Success)
+    [HttpPost("Login")]
+    public async Task<IActionResult> Login([FromBody] LoginBody loginBody)
     {
-        bool isAdmin = _loginService.IsAdmin(loginBody.Username);        
-        HttpContext.Session.SetString("Username", loginBody.Username);
-        HttpContext.Session.SetBool("IsAdmin", isAdmin); // Store the admin status
-        return Ok($"Log in successful for {loginBody.Username}");
-    }
+        LoginStatus status = await _loginService.CheckPassword(loginBody.Username, loginBody.Password);
 
-    return Unauthorized("Unknown error");
-}
+        if (status == LoginStatus.IncorrectUsername) return Unauthorized("Incorrect username");
+        if (status == LoginStatus.IncorrectPassword) return Unauthorized("Incorrect password");
+
+        if (status == LoginStatus.Success)
+        {
+            bool isAdmin = _loginService.IsAdmin(loginBody.Username);
+            if (isAdmin){HttpContext.Session.SetString("IsAdmin", isAdmin.ToString());}
+            else {HttpContext.Session.SetString("Username", loginBody.Username);}
+            return Ok($"Log in successful for {loginBody.Username}");
+        }
+
+        return Unauthorized("Unknown error");
+    }
 
     [HttpGet("IsAdminLoggedIn")]
     public IActionResult IsAdminLoggedIn()
     {
         var username = HttpContext.Session.GetString("Username");
 
-        if (string.IsNullOrEmpty(username)){return Ok(new {IsLoggedIn = false, Adminusername = (string) null});}
-        return Ok(new {IsLoggedIn = true, AdminUsername = username});        
+        if (string.IsNullOrEmpty(username)) 
+            return Ok(new { IsLoggedIn = false, AdminUsername = (string)null });
+
+        return Ok(new { IsLoggedIn = true, AdminUsername = username });
     }
 
     [HttpGet("Logout")]
@@ -52,6 +52,34 @@ public IActionResult Login([FromBody] LoginBody loginBody)
         return Ok("Logged out");
     }
 
+// WEEK 1.3
+
+    [HttpPost("Register")]
+    public async Task<IActionResult> Register([FromBody] User registrationBody)
+    {
+        var registrationResult = await _loginService.RegisterUser(registrationBody);
+
+        if (registrationResult == null)
+        {return BadRequest("User already exists");}
+
+        return Ok("User registered successfully");
+    }
+
+
+
+    // [HttpPost("AttendEvent")]
+    // public IActionResult AttendEvent([FromBody] EventBody eventBody)
+    // {
+    //     var username = HttpContext.Session.GetString("Username");
+    //     if (string.IsNullOrEmpty(username))
+    //         return Unauthorized("You need to be logged in to attend an event.");
+
+    //     var result = _eventController.MarkUserAttendance(username, eventBody.Id).Result; // Assume you have this method in EventController
+    //     if (result)
+    //         return Ok("Event attended successfully");
+
+    //     return BadRequest("Failed to mark attendance.");
+    // }
 }
 
 public class LoginBody
