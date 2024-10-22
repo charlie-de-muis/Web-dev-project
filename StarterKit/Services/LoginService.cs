@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using SQLitePCL;
 using StarterKit.Models;
 using StarterKit.Utils;
 
@@ -9,7 +8,6 @@ public enum LoginStatus { IncorrectPassword, IncorrectUsername, Success }
 
 public class LoginService : ILoginService
 {
-
     private readonly DatabaseContext _context;
 
     public LoginService(DatabaseContext context)
@@ -17,14 +15,12 @@ public class LoginService : ILoginService
         _context = context;
     }
 
-    private readonly List<User> _users = new();
-
     public async Task<LoginStatus> CheckPassword(string username, string inputPassword)
     {
         // Retrieve the admin with the specified username
         var admin = await _context.Admin.FirstOrDefaultAsync(a => a.UserName == username);
         User? user = await _context.User.FirstOrDefaultAsync(u => u.FirstName == username);
-        
+
         // Check if the admin with the given username exists
         if (admin == null && user == null)
         {
@@ -36,7 +32,7 @@ public class LoginService : ILoginService
         {
             return LoginStatus.Success; // Password matches
         }
-        if (user != null & user.Password == EncryptionHelper.EncryptPassword(inputPassword))
+        if (user != null && user.Password == EncryptionHelper.EncryptPassword(inputPassword))
         {
             return LoginStatus.Success;
         }
@@ -72,8 +68,8 @@ public class LoginService : ILoginService
             Email = user.Email,
             Password = EncryptionHelper.EncryptPassword(user.Password),
             RecuringDays = user.RecuringDays,
-            Attendances = [],
-            Event_Attendances = []
+            Attendances = new List<Attendance>(), // Initialize as an empty list
+            Event_Attendances = new List<Event_Attendance>() // Initialize as an empty list
         };
 
         await _context.User.AddAsync(newUser);
@@ -81,7 +77,8 @@ public class LoginService : ILoginService
         return newUser;
     }
 
-        public async Task<int?> GetUserIdByUsername(string username)
+    // New method to get User ID by Username
+    public async Task<int?> GetUserIdByUsername(string username)
     {
         // Attempt to find a user by their first name or username
         var user = await _context.User.FirstOrDefaultAsync(u => u.FirstName == username || u.Email == username);

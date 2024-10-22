@@ -21,9 +21,9 @@ PUT http://localhost:5097/api/v1/events/create
 Content-Type: application/json
 
 {
-    "EventId" : 67890,
-    "Title" : "Work",
-    "Description" : "Work",
+    "EventId" : 12345,
+    "Title" : "School",
+    "Description" : "School",
     "EventDate" : "2026-10-18",
     "StartTime" : "12:00:00",
     "EndTime" : "18:00:00",
@@ -74,22 +74,21 @@ Content-Type: application/json
     "Password" : "hallo987"
 }
 
-### ATTENDANCE CONTROLLER
 #### Attend event
 POST http://localhost:5097/api/v1/attendance/attend
 Content-Type: application/json
 
 {
     "UserId" : 2,
-    "EventId" : 67890
+    "EventId" : 12345
 }
 
 ### Get list of attendees
-GET http://localhost:5097/api/v1/attendance/event/67890/attendees
+GET http://localhost:5097/api/v1/attendance/event/12345/attendees
 Content-Type: application/json
 
 {
-    "EventId" : 67890
+    "EventId" : 12345
 }
 
 ### Remove user from event
