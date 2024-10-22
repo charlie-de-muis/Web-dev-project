@@ -36,11 +36,13 @@ public class EventController : Controller
         return Ok(txts);
     }
 
-    [HttpPost("create")]
-    public async Task<ActionResult<Event>> CreateEventNow([FromBody] Event eventItem)
+    [HttpPut("create")]
+    public async Task<ActionResult<Event>> CreateEvent([FromBody] Event eventItem)
     {
-        var isAdminStr = HttpContext.Session.GetString("IsAdmin");
-        if (string.IsNullOrEmpty(isAdminStr) || !bool.Parse(isAdminStr))
+        // Check if the user is an admin by retrieving the boolean value from the session
+        bool isAdmin = HttpContext.Session.GetBool("IsAdmin");
+        
+        if (!isAdmin) // If not an admin, return unauthorized
             return Unauthorized("Only admins can create events.");
 
         await _context.Event.AddAsync(eventItem);
@@ -50,11 +52,13 @@ public class EventController : Controller
     }
 
     [HttpPost("update/{id}")]
-    public async Task<ActionResult<Event>> UpdateEventNow([FromRoute] int id, [FromBody] Event new_event)
+    public async Task<ActionResult<Event>> UpdateEvent([FromRoute] int id, [FromBody] Event new_event)
     {
-        var isAdminStr = HttpContext.Session.GetString("IsAdmin");
-        if (string.IsNullOrEmpty(isAdminStr) || !bool.Parse(isAdminStr))
-            return Unauthorized("Only admins can update events.");
+        // Check if the user is an admin by retrieving the boolean value from the session
+        bool isAdmin = HttpContext.Session.GetBool("IsAdmin");
+        
+        if (!isAdmin) // If not an admin, return unauthorized
+            return Unauthorized("Only admins can create events.");
 
         var ThisEvent = await _context.Event.FirstOrDefaultAsync(e => e.EventId == id);
 
@@ -73,11 +77,13 @@ public class EventController : Controller
     }
 
     [HttpDelete("delete/{id}")]
-    public async Task<IActionResult> DeleteEventNow([FromRoute] int id)
+    public async Task<IActionResult> DeleteEvent([FromRoute] int id)
     {
-        var isAdminStr = HttpContext.Session.GetString("IsAdmin");
-        if (string.IsNullOrEmpty(isAdminStr) || !bool.Parse(isAdminStr))
-            return Unauthorized("Only admins can delete events.");
+        // Check if the user is an admin by retrieving the boolean value from the session
+        bool isAdmin = HttpContext.Session.GetBool("IsAdmin");
+        
+        if (!isAdmin) // If not an admin, return unauthorized
+            return Unauthorized("Only admins can create events.");
 
         var delEvent = await _context.Event.FirstOrDefaultAsync(e => e.EventId == id);
         if (delEvent == null) return NotFound($"Event with ID: {id} not found");
@@ -86,40 +92,6 @@ public class EventController : Controller
         await _context.SaveChangesAsync();
         return Ok();
     }
-
-    public bool MarkUserAttendance(string username, int eventId)
-        {
-            var eventToAttend = _events.FirstOrDefault(e => e.Id == eventId);
-            if (eventToAttend == null)
-            {
-                return false; // Event not found
-            }
-
-            // Check if this event already has attendees
-            if (!_eventAttendance.ContainsKey(eventId))
-            {
-                _eventAttendance[eventId] = new List<string>(); // Initialize the attendee list if it doesn't exist
-            }
-
-            // Add the user to the list of attendees if they are not already attending
-            if (!_eventAttendance[eventId].Contains(username))
-            {
-                _eventAttendance[eventId].Add(username);
-            }
-
-            return true;
-        }
-
-        // Optionally, add a method to get the list of attendees for a specific event
-        public List<string> GetEventAttendees(int eventId)
-        {
-            if (_eventAttendance.ContainsKey(eventId))
-            {
-                return _eventAttendance[eventId];
-            }
-
-            return new List<string>(); // No attendees if the event doesn't exist or has no attendees
-        }
 }
 
 public class EventBody
