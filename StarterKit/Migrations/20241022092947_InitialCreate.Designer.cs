@@ -11,7 +11,7 @@ using StarterKit.Models;
 namespace StarterKit.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20241018202208_InitialCreate")]
+    [Migration("20241022092947_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />

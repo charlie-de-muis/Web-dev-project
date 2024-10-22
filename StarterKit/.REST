@@ -51,4 +51,62 @@ Content-Type: application/json
 #### Delete event
 DELETE http://localhost:5097/api/v1/events/delete/12345
 
+#### Register as Pleb
+POST http://localhost:5097/api/v1/Login/Register
+Content-Type: application/json
 
+{
+    "Username" : "Orestis",
+    "Password" : "OrestisPassword",
+    "IsAdmin" : false
+}
+
+#### Register as Admin
+POST http://localhost:5097/api/v1/Login/Register
+Content-Type: application/json
+
+{
+    "Username" : "Orestis",
+    "Password" : "OrestisPassword",
+    "IsAdmin" : true
+}
+
+#### Create an event
+POST http://localhost:5097/api/v1/Login/CreateEvent
+Content-Type: application/json
+
+{
+    "Id" : 1,
+    "Title" : "Carnival",
+    "Description" : "Clown Absent",
+    "EventDate" : "2025-10-22",
+    "Location" : "Hyrule"
+}
+
+#### Update an event
+POST http://localhost:5097/api/v1/Login/UpdateEvent
+Content-Type: application/json
+
+{
+    "Id" : 2,
+    "Title" : "DisneyLand",
+    "Description" : "Mickey Mouse fired",
+    "EventDate" : "2026-10-22",
+    "Location" : "DisneyLand Paris"
+}
+
+#### Delete an event
+POST http://localhost:5097/api/v1/Login/DeleteEvent HTTP/1.1
+Content-Type: application/json
+
+{
+    "Id" : 2,
+    "Title" : "DisneyLand",
+    "Description" : "Mickey Mouse fired",
+    "EventDate" : "2026-10-22",
+    "Location" : "DisneyLand Paris"
+}
+####
+GET http://localhost:5097/api/v1/Login/ViewEvents
+####
+GET http://localhost:5097/api/v1/Login/AttendEvents

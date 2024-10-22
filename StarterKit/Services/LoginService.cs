@@ -18,7 +18,7 @@ public class LoginService : ILoginService
         _context = context;
     }
 
-    private readonly Dictionary<string, User> _users = new Dictionary<string, User>();
+    private readonly List<User> _users = new();
 
     public LoginStatus CheckPassword(string username, string inputPassword)
     {
@@ -51,17 +51,22 @@ public class LoginService : ILoginService
 
     public RegistrationStatus RegisterUser(string username, string password, bool isAdmin)
     {
-        if (_users.ContainsKey(username))
+        // Check if the username already exists
+        if (_users.Any(u => u.Username == username))
+        {
             return RegistrationStatus.UserAlreadyExists;
+        }
 
+        // If user doesn't exist, create a new user
         var newUser = new User
         {
             Username = username,
-            Password = password,
+            Password = password, // Consider hashing the password for security
             IsAdmin = isAdmin
         };
 
-        _users.Add(username, newUser);
+        _users.Add(newUser); // Simulating saving to a database
+
         return RegistrationStatus.Success;
     }
 }
@@ -71,4 +76,10 @@ public class User
     public string Username { get; set; }
     public string Password { get; set; }
     public bool IsAdmin { get; set; }
+}
+
+public enum RegistrationStatus
+{
+    Success,
+    UserAlreadyExists
 }
