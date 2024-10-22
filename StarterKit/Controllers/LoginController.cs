@@ -9,18 +9,16 @@ namespace StarterKit.Controllers;
 public class LoginController : Controller
 {
     private readonly ILoginService _loginService;
-    private readonly EventController _eventController;
 
-    public LoginController(ILoginService loginService, EventController eventController)
+    public LoginController(ILoginService loginService)
     {
         _loginService = loginService;
-        _eventController = eventController;
     }
 
     [HttpPost("Login")]
-    public IActionResult Login([FromBody] LoginBody loginBody)
+    public async Task<IActionResult> Login([FromBody] LoginBody loginBody)
     {
-        LoginStatus status = _loginService.CheckPassword(loginBody.Username, loginBody.Password);
+        LoginStatus status = await _loginService.CheckPassword(loginBody.Username, loginBody.Password);
 
         if (status == LoginStatus.IncorrectUsername) return Unauthorized("Incorrect username");
         if (status == LoginStatus.IncorrectPassword) return Unauthorized("Incorrect password");
@@ -28,8 +26,8 @@ public class LoginController : Controller
         if (status == LoginStatus.Success)
         {
             bool isAdmin = _loginService.IsAdmin(loginBody.Username);
-            HttpContext.Session.SetString("Username", loginBody.Username);
-            HttpContext.Session.SetString("IsAdmin", isAdmin.ToString()); // Convert bool to string
+            if (isAdmin){HttpContext.Session.SetString("IsAdmin", isAdmin.ToString());}
+            else {HttpContext.Session.SetString("Username", loginBody.Username);}
             return Ok($"Log in successful for {loginBody.Username}");
         }
 
@@ -54,51 +52,34 @@ public class LoginController : Controller
         return Ok("Logged out");
     }
 
-    [HttpPost("Register")]
-    public IActionResult Register([FromBody] RegistrationBody registrationBody)
-    {
-        var registrationResult = _loginService.RegisterUser(registrationBody.Username, registrationBody.Password, registrationBody.IsAdmin);
+// WEEK 1.3
 
-        if (registrationResult == RegistrationStatus.UserAlreadyExists)
-            return Conflict("Username already taken");
+    [HttpPost("Register")]
+    public async Task<IActionResult> Register([FromBody] User registrationBody)
+    {
+        var registrationResult = await _loginService.RegisterUser(registrationBody);
+
+        if (registrationResult == null)
+        {return BadRequest("User already exists");}
 
         return Ok("User registered successfully");
     }
 
-    public class RegistrationBody
-    {
-        public string? Username { get; set; }
-        public string? Password { get; set; }
-        public bool IsAdmin { get; set; }
-    }
 
-    private bool IsAdminLoggedInNow()
-    {
-        var isAdminStr = HttpContext.Session.GetString("IsAdmin");
-        return isAdminStr != null && bool.Parse(isAdminStr); // Convert string back to bool
-    }
 
-    // Refine Event Access for Regular Users
-    [HttpGet("ViewEvents")]
-    public IActionResult ViewEvents()
-    {
-        var result = _eventController.GetEvents().Result; // Call to EventController
-        return Ok(result);
-    }
+    // [HttpPost("AttendEvent")]
+    // public IActionResult AttendEvent([FromBody] EventBody eventBody)
+    // {
+    //     var username = HttpContext.Session.GetString("Username");
+    //     if (string.IsNullOrEmpty(username))
+    //         return Unauthorized("You need to be logged in to attend an event.");
 
-    [HttpPost("AttendEvent")]
-    public IActionResult AttendEvent([FromBody] EventBody eventBody)
-    {
-        var username = HttpContext.Session.GetString("Username");
-        if (string.IsNullOrEmpty(username))
-            return Unauthorized("You need to be logged in to attend an event.");
+    //     var result = _eventController.MarkUserAttendance(username, eventBody.Id).Result; // Assume you have this method in EventController
+    //     if (result)
+    //         return Ok("Event attended successfully");
 
-        var result = _eventController.MarkUserAttendance(username, eventBody.Id).Result; // Assume you have this method in EventController
-        if (result)
-            return Ok("Event attended successfully");
-
-        return BadRequest("Failed to mark attendance.");
-    }
+    //     return BadRequest("Failed to mark attendance.");
+    // }
 }
 
 public class LoginBody

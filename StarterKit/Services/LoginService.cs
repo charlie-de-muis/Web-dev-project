@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using SQLitePCL;
 using StarterKit.Models;
 using StarterKit.Utils;
@@ -5,8 +6,6 @@ using StarterKit.Utils;
 namespace StarterKit.Services;
 
 public enum LoginStatus { IncorrectPassword, IncorrectUsername, Success }
-
-public enum ADMIN_SESSION_KEY { adminLoggedIn }
 
 public class LoginService : ILoginService
 {
@@ -20,21 +19,26 @@ public class LoginService : ILoginService
 
     private readonly List<User> _users = new();
 
-    public LoginStatus CheckPassword(string username, string inputPassword)
+    public async Task<LoginStatus> CheckPassword(string username, string inputPassword)
     {
         // Retrieve the admin with the specified username
-        var admin = _context.Admin.SingleOrDefault(a => a.UserName == username);
+        var admin = await _context.Admin.FirstOrDefaultAsync(a => a.UserName == username);
+        User? user = await _context.User.FirstOrDefaultAsync(u => u.FirstName == username);
         
         // Check if the admin with the given username exists
-        if (admin == null)
+        if (admin == null && user == null)
         {
             return LoginStatus.IncorrectUsername; // Username doesn't exist in the database
         }
 
         // Compare the provided password with the stored password
-        if (admin.Password == EncryptionHelper.EncryptPassword(inputPassword))
+        if (admin != null && admin.Password == EncryptionHelper.EncryptPassword(inputPassword))
         {
             return LoginStatus.Success; // Password matches
+        }
+        if (user != null & user.Password == EncryptionHelper.EncryptPassword(inputPassword))
+        {
+            return LoginStatus.Success;
         }
         else
         {
@@ -49,37 +53,31 @@ public class LoginService : ILoginService
         return admin != null; // Returns true if admin exists
     }
 
-    public RegistrationStatus RegisterUser(string username, string password, bool isAdmin)
+    public async Task<User?> RegisterUser(User user)
     {
-        // Check if the username already exists
-        if (_users.Any(u => u.Username == username))
+        // Check if the user already exists by email (or username, if available)
+        var usermaybe = await _context.User.FirstOrDefaultAsync(u => u.Email == user.Email);
+
+        if (usermaybe is User)
         {
-            return RegistrationStatus.UserAlreadyExists;
+            // If user exists, return null
+            return null;
         }
 
         // If user doesn't exist, create a new user
-        var newUser = new User
+        User newUser = new User
         {
-            Username = username,
-            Password = password, // Consider hashing the password for security
-            IsAdmin = isAdmin
+            FirstName = user.FirstName,
+            LastName = user.LastName,
+            Email = user.Email,
+            Password = EncryptionHelper.EncryptPassword(user.Password),
+            RecuringDays = user.RecuringDays,
+            Attendances = [],
+            Event_Attendances = []
         };
 
-        _users.Add(newUser); // Simulating saving to a database
-
-        return RegistrationStatus.Success;
+        await _context.User.AddAsync(newUser);
+        await _context.SaveChangesAsync();
+        return newUser;
     }
-}
-
-public class User
-{
-    public string Username { get; set; }
-    public string Password { get; set; }
-    public bool IsAdmin { get; set; }
-}
-
-public enum RegistrationStatus
-{
-    Success,
-    UserAlreadyExists
 }
