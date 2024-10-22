@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace StarterKit.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/v1/[controller]")]
     public class AttendanceController : ControllerBase
     {
         private readonly DatabaseContext _dbContext;
@@ -56,7 +56,7 @@ namespace StarterKit.Controllers
                 .Where(ea => ea.User.UserId == request.UserId && ea.Event.EventId == request.EventId)
                 .FirstOrDefaultAsync();
 
-            if (existingAttendance != null)
+            if (existingAttendance!= null)
             {
                 return Conflict("The user is already registered for this event.");
             }
@@ -115,45 +115,46 @@ namespace StarterKit.Controllers
             return Ok(attendees);
         }
 
-        // New DELETE endpoint to allow a user to cancel their attendance
-        [HttpDelete]
-        [Route("cancel/{eventId}")]
-        public async Task<IActionResult> CancelAttendance(int eventId)
-        {
-            // Check if the user is logged in
-            if (!User.Identity.IsAuthenticated)
-            {
-                return Unauthorized();
-            }
-
-            // Fetch the user (replace with your actual user fetching logic)
-            var userId = int.Parse(User.FindFirst("UserId").Value);
-            var user = await _dbContext.User.FindAsync(userId);
-            if (user == null)
-            {
-                return NotFound("User not found.");
-            }
-
-            // Find the attendance record for the specified event
-            var attendanceToDelete = await _dbContext.Event_Attendance
-                .FirstOrDefaultAsync(ea => ea.User.UserId == userId && ea.Event.EventId == eventId);
-
-            if (attendanceToDelete == null)
-            {
-                return NotFound("Attendance record not found.");
-            }
-
-            // Remove the attendance record from the database
-            _dbContext.Event_Attendance.Remove(attendanceToDelete);
-            await _dbContext.SaveChangesAsync();
-
-            return NoContent(); // Return 204 No Content on successful deletion
-        }
+[HttpDelete]
+[Route("cancel/{eventId}")]
+public async Task<IActionResult> CancelAttendance(int eventId)
+{
+    // Check if the user is logged in
+    if (!User.Identity.IsAuthenticated)
+    {
+        return Unauthorized();
     }
+
+    // Get the UserId from the claims
+    var userIdClaim = User.FindFirst("UserId");
+    if (userIdClaim == null)
+    {
+        return Unauthorized("User ID claim not found.");
+    }
+
+    var userId = int.Parse(userIdClaim.Value);
+
+    // Fetch the attendance record for the specified event
+    var attendanceToDelete = await _dbContext.Event_Attendance
+        .FirstOrDefaultAsync(ea => ea.User.UserId == userId && ea.Event.EventId == eventId);
+
+    // Check if the attendance record exists
+    if (attendanceToDelete == null)
+    {
+        return NotFound("Attendance record not found.");
+    }
+
+    // Remove the attendance record from the database
+    _dbContext.Event_Attendance.Remove(attendanceToDelete);
+    await _dbContext.SaveChangesAsync();
+
+    return Ok("Attendance cancelled"); // Return Ok on successful deletion
+}
 
     public class AttendanceRequest
     {
         public int UserId { get; set; }
         public int EventId { get; set; }
     }
+}
 }

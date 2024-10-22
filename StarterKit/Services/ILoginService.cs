@@ -4,4 +4,6 @@ public interface ILoginService {
     public Task<LoginStatus> CheckPassword(string username, string inputPassword);
     bool IsAdmin(string username);
     Task<Models.User?> RegisterUser(Models.User user);
+
+    Task<int?> GetUserIdByUsername(string username);
 }

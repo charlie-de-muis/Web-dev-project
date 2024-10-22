@@ -56,20 +56,41 @@ POST http://localhost:5097/api/v1/Login/Register
 Content-Type: application/json
 
 {
-    "UserId" : "4",
-    "FirstName" : "Orestis",
-    "LastName" : "Margaritis",
-    "Email" : "orestis@gmail.com",
+    "UserId" : "2",
+    "FirstName" : "Orestisa",
+    "LastName" : "Margaritisa",
+    "Email" : "orestisa@gmail.com",
     "Password" : "hallo987",
     "RecuringDays" : "ma,di,wo",
     "Attendances" : [],
     "Event_Attendances" : []
 }
-####
+#### Login as user
 POST http://localhost:5097/api/v1/Login/Login HTTP/1.1
 Content-Type: application/json
 
 {
-    "Username" : "Orestis",
+    "Username" : "Orestisa",
     "Password" : "hallo987"
 }
+
+#### Attend event
+POST http://localhost:5097/api/v1/attendance/attend
+Content-Type: application/json
+
+{
+    "UserId" : 2,
+    "EventId" : 12345
+}
+
+### Get list of attendees
+GET http://localhost:5097/api/v1/attendance/event/12345/attendees
+Content-Type: application/json
+
+{
+    "EventId" : 12345
+}
+
+### Remove user from event
+DELETE http://localhost:5097/api/v1/attendance/cancel/12345
+Content-Type: application/json
