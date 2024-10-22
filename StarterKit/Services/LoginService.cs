@@ -80,4 +80,12 @@ public class LoginService : ILoginService
         await _context.SaveChangesAsync();
         return newUser;
     }
+
+        public async Task<int?> GetUserIdByUsername(string username)
+    {
+        // Attempt to find a user by their first name or username
+        var user = await _context.User.FirstOrDefaultAsync(u => u.FirstName == username || u.Email == username);
+        
+        return user?.UserId; // Assuming UserId is the primary key in your User model
+    }
 }

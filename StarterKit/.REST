@@ -21,9 +21,9 @@ PUT http://localhost:5097/api/v1/events/create
 Content-Type: application/json
 
 {
-    "EventId" : 12345,
-    "Title" : "School",
-    "Description" : "School",
+    "EventId" : 67890,
+    "Title" : "Work",
+    "Description" : "Work",
     "EventDate" : "2026-10-18",
     "StartTime" : "12:00:00",
     "EndTime" : "18:00:00",
@@ -56,20 +56,52 @@ POST http://localhost:5097/api/v1/Login/Register
 Content-Type: application/json
 
 {
-    "UserId" : "4",
-    "FirstName" : "Orestis",
-    "LastName" : "Margaritis",
-    "Email" : "orestis@gmail.com",
+    "UserId" : "2",
+    "FirstName" : "Orestisa",
+    "LastName" : "Margaritisa",
+    "Email" : "orestisa@gmail.com",
     "Password" : "hallo987",
     "RecuringDays" : "ma,di,wo",
     "Attendances" : [],
     "Event_Attendances" : []
 }
-####
+#### Login as user
 POST http://localhost:5097/api/v1/Login/Login HTTP/1.1
 Content-Type: application/json
 
 {
-    "Username" : "Orestis",
+    "Username" : "Orestisa",
     "Password" : "hallo987"
+}
+
+### ATTENDANCE CONTROLLER
+#### Attend event
+POST http://localhost:5097/api/v1/attendance/attend
+Content-Type: application/json
+
+{
+    "UserId" : 2,
+    "EventId" : 67890
+}
+
+### Get list of attendees
+GET http://localhost:5097/api/v1/attendance/event/67890/attendees
+Content-Type: application/json
+
+{
+    "EventId" : 67890
+}
+
+### Remove user from event
+DELETE http://localhost:5097/api/v1/attendance/cancel/12345
+Content-Type: application/json
+
+### OFFICE ATTENDANCE CONTROLLER
+### Update Attendance Request
+PUT http://localhost:5097/api/v1/officeattendance/update
+Content-Type: application/json
+
+{
+  "currentEventId": 67890,
+  "newEventId": 12345
 }
