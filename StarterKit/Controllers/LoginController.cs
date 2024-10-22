@@ -26,8 +26,8 @@ public class LoginController : Controller
         if (status == LoginStatus.Success)
         {
             bool isAdmin = _loginService.IsAdmin(loginBody.Username);
-            if (isAdmin){HttpContext.Session.SetString("IsAdmin", isAdmin.ToString());}
-            else {HttpContext.Session.SetString("Username", loginBody.Username);}
+            HttpContext.Session.SetBool("IsAdmin", isAdmin); // Use SetBool here
+            HttpContext.Session.SetString("Username", loginBody.Username);
             return Ok($"Log in successful for {loginBody.Username}");
         }
 
@@ -42,7 +42,10 @@ public class LoginController : Controller
         if (string.IsNullOrEmpty(username)) 
             return Ok(new { IsLoggedIn = false, AdminUsername = (string)null });
 
-        return Ok(new { IsLoggedIn = true, AdminUsername = username });
+        // Retrieve the admin status from the session
+        bool isAdmin = HttpContext.Session.GetBool("IsAdmin");
+        
+        return Ok(new { IsLoggedIn = true, IsAdmin = isAdmin, AdminUsername = username });
     }
 
     [HttpGet("Logout")]
