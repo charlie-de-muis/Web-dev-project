@@ -11,7 +11,13 @@ namespace StarterKit
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            builder.Services.AddControllersWithViews();
+            // Configure services
+            builder.Services.AddControllersWithViews()
+                .AddJsonOptions(options =>
+                {
+                    // Use IgnoreCycles to handle circular references
+                    options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+                });
 
             builder.Services.AddDistributedMemoryCache();
 
@@ -59,10 +65,8 @@ namespace StarterKit
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
 
-
             app.Urls.Add("http://localhost:5097");
             app.Run();
-
         }
     }
 }
