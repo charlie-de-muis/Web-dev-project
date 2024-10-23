@@ -56,6 +56,29 @@ POST http://localhost:5097/api/v1/events/StarReview/12345
 Content-Type: application/json
 
 {
-    "stars" : 5,
-    "review": "I liked it, i would take my crush to this event."
+    "Event_AttendanceId": 4,
+    "Rating": 5,
+    "Feedback": "The event was fantastic! I had a great time and would highly recommend it. I ordered 10.000 beers.",
+    "User": {
+        "UserId": 1,
+        "FirstName": "Bente",
+        "LastName": "Loah Prik",
+        "Email": "bent.doe@example.com",
+        "Password": "password123",
+        "RecuringDays": "Monday, Wednesday, Friday",
+        "Attendances": [],
+        "Event_Attendances": []
+    },
+    "Event": {
+        "EventId": 100,
+        "Title": "Mocktail Night",
+        "Description": "A night filled with refreshing non-alcoholic cocktails, games, and great conversations.",
+        "EventDate": "2024-11-15",
+        "StartTime": "19:00:00",
+        "EndTime": "22:00:00",
+        "Location": "Downtown Event Hall",
+        "AdminApproval": true,
+        "Event_Attendances": []
+    }
 }
+

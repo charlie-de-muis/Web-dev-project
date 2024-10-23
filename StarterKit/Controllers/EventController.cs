@@ -89,21 +89,18 @@ public class EventController : Controller
     }
 
     [HttpPost("StarReview/{id}")]
-    public async Task<IActionResult> StarReview([FromBody] ReviewMap reviewmap)
+    public async Task<IActionResult> StarReview([FromBody] Event_Attendance EA)
     {
-        if (reviewmap != null && reviewmap.Review != null && reviewmap.Stars > 0)
-    {
-        return Ok($"{reviewmap.Stars} Stars: {reviewmap.Review}");
-    }
+        if (EA != null && EA.Event_AttendanceId > 0 && EA.Rating > 0 && EA.Rating <= 5 &&
+            !string.IsNullOrEmpty(EA.Feedback) &&
+            EA.User != null && !string.IsNullOrEmpty(EA.User.FirstName) && !string.IsNullOrEmpty(EA.User.LastName) &&
+            EA.Event != null && !string.IsNullOrEmpty(EA.Event.Title))
+        {
+            return Ok($"{EA.Rating} Stars: {EA.Feedback} - Reviewed by {EA.User.FirstName} {EA.User.LastName} for the event '{EA.Event.Title}'");
+        }
         else
         {
-            return BadRequest("No review found.");
+            return BadRequest("Incomplete or invalid review data.");
         }
     }
-    public class ReviewMap
-    {
-        public int Stars { get; set; }
-        public string Review { get; set; }
-    }
-
 }
