@@ -89,13 +89,15 @@ public class EventController : Controller
     }
 
     [HttpPost("StarReview/{id}")]
-    public async Task<IActionResult> StarReview([FromBody] Event_Attendance EA)
+    public async Task<IActionResult> StarReview([FromBody] Event_Attendance? EA)
     {
         if (EA != null && EA.Event_AttendanceId > 0 && EA.Rating > 0 && EA.Rating <= 5 &&
             !string.IsNullOrEmpty(EA.Feedback) &&
             EA.User != null && !string.IsNullOrEmpty(EA.User.FirstName) && !string.IsNullOrEmpty(EA.User.LastName) &&
             EA.Event != null && !string.IsNullOrEmpty(EA.Event.Title))
         {
+            await _context.Event_Attendance.AddAsync(EA);
+            await _context.SaveChangesAsync();
             return Ok($"{EA.Rating} Stars: {EA.Feedback} - Reviewed by {EA.User.FirstName} {EA.User.LastName} for the event '{EA.Event.Title}'");
         }
         else

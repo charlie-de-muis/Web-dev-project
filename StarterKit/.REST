@@ -70,7 +70,7 @@ Content-Type: application/json
         "Event_Attendances": []
     },
     "Event": {
-        "EventId": 100,
+        "EventId": 12345,
         "Title": "Mocktail Night",
         "Description": "A night filled with refreshing non-alcoholic cocktails, games, and great conversations.",
         "EventDate": "2024-11-15",
