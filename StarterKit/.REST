@@ -21,9 +21,9 @@ PUT http://localhost:5097/api/v1/events/create
 Content-Type: application/json
 
 {
-    "EventId" : 123457,
-    "Title" : "School",
-    "Description" : "School",
+    "EventId" : 345,
+    "Title" : "Work",
+    "Description" : "Work",
     "EventDate" : "2026-10-18",
     "StartTime" : "12:00:00",
     "EndTime" : "18:00:00",
@@ -56,10 +56,10 @@ POST http://localhost:5097/api/v1/Login/Register
 Content-Type: application/json
 
 {
-    "UserId" : "2",
-    "FirstName" : "Orestisa",
-    "LastName" : "Margaritisa",
-    "Email" : "orestisa@gmail.com",
+    "UserId" : "1",
+    "FirstName" : "Orestis",
+    "LastName" : "Margaritis",
+    "Email" : "orestis@gmail.com",
     "Password" : "hallo987",
     "RecuringDays" : "ma,di,wo",
     "Attendances" : [],
@@ -70,7 +70,7 @@ POST http://localhost:5097/api/v1/Login/Login HTTP/1.1
 Content-Type: application/json
 
 {
-    "Username" : "Orestisa",
+    "Username" : "Orestis",
     "Password" : "hallo987"
 }
 
