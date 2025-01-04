@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-// Modal to ask for Event ID (Reusable for Edit and Delete)
+// Modal to ask for Event ID (Reusable for Edit, Delete, and Attendees)
 const EventIdPopup: React.FC<{ 
-  action: "edit" | "delete"; 
+  action: "edit" | "delete" | "attendees"; 
   onSubmit: (eventId: string) => void; 
 }> = ({ action, onSubmit }) => {
   const [eventId, setEventId] = useState<string>("");
@@ -21,13 +21,19 @@ const EventIdPopup: React.FC<{
   return (
     <div>
       <button onClick={() => setIsOpen(true)}>
-        {action === "edit" ? "Edit Event" : "Delete Event"}
+        {action === "edit" && "Edit Event"}
+        {action === "delete" && "Delete Event"}
+        {action === "attendees" && "View Attendees"}
       </button>
 
       {isOpen && (
         <div style={modalStyle}>
           <div style={modalContentStyle}>
-            <h2>{action === "edit" ? "Enter Event ID to Edit" : "Enter Event ID to Delete"}</h2>
+            <h2>
+              {action === "edit" && "Enter Event ID to Edit"}
+              {action === "delete" && "Enter Event ID to Delete"}
+              {action === "attendees" && "Enter Event ID to View Attendees"}
+            </h2>
             <input
               type="text"
               value={eventId}
@@ -79,6 +85,10 @@ export default function Admin_loggedin() {
     navigate(`/admin/delete-event/${eventId}`);
   };
 
+  const handleAttendeesSubmit = (eventId: string) => {
+    navigate(`/admin/attendees/${eventId}`); // Redirect to the attendees page for the event
+  }
+
   return (
     <div>
       <h1>Welcome admin!</h1>
@@ -92,6 +102,8 @@ export default function Admin_loggedin() {
       <EventIdPopup action="edit" onSubmit={handleEditSubmit} />
       {/* Delete Event Popup */}
       <EventIdPopup action="delete" onSubmit={handleDeleteSubmit} />
+      {/* Attendees Popup */}
+      <EventIdPopup action="attendees" onSubmit={handleAttendeesSubmit} />
       <a href="http://localhost:5097/Logout">
         <button>Log out</button>
       </a>
