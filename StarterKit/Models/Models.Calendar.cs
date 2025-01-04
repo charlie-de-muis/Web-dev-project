@@ -50,6 +50,6 @@ public class User
 
         public bool? AdminApproval { get; set; }
 
-        public required List<Event_Attendance> Event_Attendances { get; set; }
+        public List<Event_Attendance> Event_Attendances { get; set; } = new List<Event_Attendance>();
     }
 }

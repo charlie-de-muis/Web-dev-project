@@ -23,12 +23,12 @@ public async Task<IActionResult> Login([FromBody] LoginBody loginBody)
 {
     LoginStatus status = await _loginService.CheckPassword(loginBody.Username, loginBody.Password);
 
-    if (status == LoginStatus.IncorrectUsername) 
+    if (status == LoginStatus.IncorrectUsername)
     {
         return Unauthorized("Incorrect username");
     }
 
-    if (status == LoginStatus.IncorrectPassword) 
+    if (status == LoginStatus.IncorrectPassword)
     {
         return Unauthorized("Incorrect password");
     }
@@ -36,32 +36,26 @@ public async Task<IActionResult> Login([FromBody] LoginBody loginBody)
     if (status == LoginStatus.Success)
     {
         bool isAdmin = _loginService.IsAdmin(loginBody.Username);
-        HttpContext.Session.SetBool("IsAdmin", isAdmin);
-        HttpContext.Session.SetString("Username", loginBody.Username);
         
-        // Log the isAdmin value for debugging
-        Console.WriteLine($"Is Admin: {isAdmin}");
-
-        if (isAdmin){return Ok($"Log in successful for {loginBody.Username}");}
         // Get UserId using the new method
         int? userId = await _loginService.GetUserIdByUsername(loginBody.Username);
         if (userId.HasValue)
         {
-            // Add UserId claim
-            var claims = new List<Claim>
+            // Set session values
+            HttpContext.Session.SetString("Username", loginBody.Username);
+            HttpContext.Session.SetInt32("UserId", userId.Value);
+            HttpContext.Session.SetBool("IsAdmin", isAdmin);
+
+            // Optionally, create a cookie with the username
+            var cookieOptions = new CookieOptions
             {
-                new Claim(ClaimTypes.Name, loginBody.Username),
-                new Claim("IsAdmin", isAdmin.ToString()),
-                new Claim("UserId", userId.Value.ToString()) // Add UserId claim
+                HttpOnly = true,  // Make cookie HTTPOnly for security
+                Secure = true,    // Only send cookie over HTTPS
+                SameSite = SameSiteMode.Strict,
+                Expires = DateTime.Now.AddHours(1)  // Expire in 1 hour (or customize as needed)
             };
 
-            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-            var authProperties = new AuthenticationProperties
-            {
-                IsPersistent = true
-            };
-
-            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity), authProperties);
+            Response.Cookies.Append("authToken", "some_secure_token_here", cookieOptions);  // You can store a session or JWT token here if desired
 
             return Ok($"Log in successful for {loginBody.Username}");
         }
@@ -108,22 +102,6 @@ public async Task<IActionResult> Login([FromBody] LoginBody loginBody)
 
         return Ok("User registered successfully");
     }
-
-
-
-    // [HttpPost("AttendEvent")]
-    // public IActionResult AttendEvent([FromBody] EventBody eventBody)
-    // {
-    //     var username = HttpContext.Session.GetString("Username");
-    //     if (string.IsNullOrEmpty(username))
-    //         return Unauthorized("You need to be logged in to attend an event.");
-
-    //     var result = _eventController.MarkUserAttendance(username, eventBody.Id).Result; // Assume you have this method in EventController
-    //     if (result)
-    //         return Ok("Event attended successfully");
-
-    //     return BadRequest("Failed to mark attendance.");
-    // }
 }
 
 public class LoginBody

@@ -20,23 +20,26 @@ public class EventController : Controller
     public async Task<ActionResult<IEnumerable<string>>> GetEvents()
     {
         List<Event> events = await _context.Event.ToListAsync();
-        List<string> txts = new List<string>();
+        List<string> eventStrings = new List<string>();
 
-        foreach (Event e in events)
+        foreach (var e in events)
         {
-            string txt = $"Event ID: {e.EventId}  " +
-                        $"Event name: {e.Title}  " +
-                        $"Description: {e.Description}  " +
-                        $"Date: {e.EventDate}  " +
-                        $"Attendances: {(e.Event_Attendances != null ? string.Join(", ", e.Event_Attendances.Select(a => a.User.FirstName + " " + a.User.LastName)) : "")}  " +
-                        $"Reviews: {(e.Event_Attendances != null ? string.Join(", ", e.Event_Attendances.Select(a => a.Feedback)) : "")}";
+            string eventText = $"Event ID: {e.EventId} | " +
+                            $"Title: {e.Title} | " +
+                            $"Description: {e.Description} | " +
+                            $"Date: {e.EventDate} | " +
+                            $"Start Time: {e.StartTime} | " +
+                            $"End Time: {e.EndTime} | " +
+                            $"Location: {e.Location} | " +
+                            $"Attendees: {(e.Event_Attendances != null ? string.Join(", ", e.Event_Attendances.Select(a => a.User.FirstName + " " + a.User.LastName)) : "No attendees")}";
 
-            txts.Add(txt);
+            eventStrings.Add(eventText);
         }
-        return Ok(txts);
+
+        return Ok(eventStrings);
     }
 
-    [HttpPut("create")]
+    [HttpPost("create")]
     public async Task<ActionResult<Event>> CreateEventNow([FromBody] Event eventItem)
     {
         // Check if the user is an admin by retrieving the boolean value from the session
@@ -51,7 +54,7 @@ public class EventController : Controller
         return CreatedAtAction(nameof(GetEvents), new { id = eventItem.EventId }, eventItem);
     }
 
-    [HttpPost("update/{id}")]
+    [HttpPut("update/{id}")]
     public async Task<ActionResult<Event>> UpdateEventNow([FromRoute] int id, [FromBody] Event new_event)
     {
         // Check if the user is an admin by retrieving the boolean value from the session
@@ -71,6 +74,7 @@ public class EventController : Controller
         ThisEvent.EndTime = new_event.EndTime;
         ThisEvent.Location = new_event.Location;
         ThisEvent.Event_Attendances = new_event.Event_Attendances;
+        if (new_event.Event_Attendances is null){new_event.Event_Attendances = new List<Event_Attendance>();}
 
         await _context.SaveChangesAsync();
         return Ok(ThisEvent);
@@ -90,7 +94,7 @@ public class EventController : Controller
 
         _context.Event.Remove(delEvent);
         await _context.SaveChangesAsync();
-        return Ok();
+        return Ok(new { message = "Event deleted successfully" });
     }
 
     public bool MarkUserAttendance(string username, int eventId)
@@ -126,4 +130,18 @@ public class EventController : Controller
 
             return new List<string>(); // No attendees if the event doesn't exist or has no attendees
         }
+
+    [HttpGet("{id}")]
+    public async Task<ActionResult<Event>> GetEventById(int id)
+    {
+        var eventItem = await _context.Event.FirstOrDefaultAsync(e => e.EventId == id);
+
+        if (eventItem == null)
+        {
+            return NotFound($"Event with ID {id} not found");
+        }
+
+        return Ok(eventItem);
+}
+
 }

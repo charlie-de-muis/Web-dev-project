@@ -16,8 +16,10 @@ GET http://localhost:5097/api/v1/Login/IsAdminLoggedIn
 #### get all events
 GET http://localhost:5097/api/v1/events
 
+#### get one event
+
 #### create event
-PUT http://localhost:5097/api/v1/events/create
+POST http://localhost:5097/api/v1/events/create
 Content-Type: application/json
 
 {
@@ -33,7 +35,7 @@ Content-Type: application/json
 }
 
 #### Update event
-POST http://localhost:5097/api/v1/events/update/12345
+PUT http://localhost:5097/api/v1/events/update/12345
 Content-Type: application/json
 
 {
