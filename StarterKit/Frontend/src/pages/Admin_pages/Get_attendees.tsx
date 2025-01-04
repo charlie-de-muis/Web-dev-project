@@ -94,6 +94,9 @@ const AttendeesList: React.FC = () => {
           </tbody>
         </table>
       )}
+      <a href="/admin">
+        <button>Back</button>
+      </a>
     </div>
   );
 };
