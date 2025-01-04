@@ -81,12 +81,12 @@ POST http://localhost:5097/api/v1/attendance/attend
 Content-Type: application/json
 
 {
-    "UserId" : 1,
-    "EventId" : 12345
+    "UserId" : 2,
+    "EventId" : 123457
 }
 
 ### Get list of attendees
-GET http://localhost:5097/api/v1/attendance/event/12345/attendees
+GET http://localhost:5097/api/v1/attendance/event/123457/attendees
 Content-Type: application/json
 
 {

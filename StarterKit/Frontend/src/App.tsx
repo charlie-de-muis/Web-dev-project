@@ -11,6 +11,7 @@ import Events from "./pages/Admin_pages/Event_table";
 import CreateEventForm from "./pages/Admin_pages/Create_event";
 import EditEventForm from "./pages/Admin_pages/Edit_event";
 import DeleteEvent from "./pages/Admin_pages/Delete_event";
+import AttendeesList from "./pages/Admin_pages/Get_attendees";
 
 const Dashboard: React.FC = () => <h1>Calendify</h1>; // Temporary placeholder
 // pagina's opstellen + url's
@@ -32,7 +33,8 @@ const App: React.FC = () => {
             <Route path="/admin/events" element={<Events />} />
             <Route path="/admin/create-event" element={<CreateEventForm />} />
             <Route path="/admin/update-event/:id" element={<EditEventForm />} />
-            <Route path="admin/delete-event/:eventId" element={<DeleteEvent />} />
+            <Route path="/admin/delete-event/:eventId" element={<DeleteEvent />} />
+            <Route path="/admin/attendees/:eventId" element={<AttendeesList />} />
 
         </Routes>
     );

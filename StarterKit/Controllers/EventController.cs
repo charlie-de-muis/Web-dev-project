@@ -121,6 +121,7 @@ public class EventController : Controller
         }
 
         // Optionally, add a method to get the list of attendees for a specific event
+        [HttpGet("attendees/{eventId}")]
         public List<string> GetEventAttendees(int eventId)
         {
             if (_eventAttendance.ContainsKey(eventId))
