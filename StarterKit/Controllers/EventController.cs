@@ -143,6 +143,13 @@ public class EventController : Controller
         }
 
         return Ok(eventItem);
-}
+    }
 
+    [HttpGet("{id}/review")]
+    public async Task<ActionResult<int>> GetReview(int id)
+    {
+        var eventitem = await _context.Event_Attendance.FirstOrDefaultAsync(e => e.Event.EventId == id);
+
+        return Ok(eventitem.Rating);
+    }
 }
