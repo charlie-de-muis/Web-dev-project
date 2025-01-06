@@ -115,3 +115,13 @@ Content-Type: application/json
   "feedback": "Great event! Learned a lot.",
   "rating": 5
 }
+
+####
+POST http://localhost:5097/api/v1/attendance/workdays
+Content-Type: application/json
+
+{
+  "NewDays": "ma,di,wo,do"
+}
+
+

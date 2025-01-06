@@ -172,6 +172,33 @@ public class AttendanceController : ControllerBase
         return Ok("Attendance cancelled"); // Return Ok on successful deletion
     }
 
+    // Workdays API
+
+    [HttpPost("workdays")]
+    public async Task<IActionResult> Change_attendance([FromBody] WorkdaysRequest request)
+    {
+        // Check if the user is authenticated by verifying session/cookie
+        var userId = HttpContext.Session.GetInt32("UserId");
+
+        if (!userId.HasValue)
+        {
+            return Unauthorized("No user found in session");
+        }
+
+        var user = await _dbContext.User.FirstOrDefaultAsync(u => u.UserId == userId.Value);
+        if (user == null)
+        {
+            return BadRequest("No user found");
+        }
+
+        user.RecuringDays = request.NewDays;
+
+        await _dbContext.SaveChangesAsync();
+
+        return Ok("Workdays updated.");
+    }
+
+    
     [Authorize]
     [HttpPost]
     [Route("event/{eventId}/review")]
@@ -225,3 +252,7 @@ public class AttendanceController : ControllerBase
     }
 }
 
+    public class WorkdaysRequest
+    {
+        public string NewDays { get; set; }
+    }

@@ -82,6 +82,9 @@ const HomePage: React.FC = () => {
           )}
         </tbody>
       </table>
+      <a href="http://localhost:5097/user/workdays">
+        <button>Change workdays</button>
+      </a>
       <a href="http://localhost:5097/Logout">
         <button>Log out</button>
       </a>

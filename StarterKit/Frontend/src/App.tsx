@@ -14,6 +14,7 @@ import AttendeesList from "./pages/Admin_pages/Get_attendees";
 import HomePage from "./pages/User_pages/User_LoggedIn";
 import EventDetails from "./pages/User_pages/Event_details";
 import ReviewForm from "./pages/User_pages/Place_feedback";
+import ChangeWorkdaysPage from "./pages/User_pages/Change_workdays";
 
 const Dashboard: React.FC = () => <h1>Calendify</h1>; // Temporary placeholder
 // pagina's opstellen + url's
@@ -35,6 +36,9 @@ const App: React.FC = () => {
             <Route
                 path="/review/:id"
                 element={<PrivateRoute element={<ReviewForm />} />} />
+            <Route
+                path="/user/workdays"
+                element={<PrivateRoute element={<ChangeWorkdaysPage />} />} />
             <Route 
                 path="/admin" 
                 element={<PrivateRoute element={<Admin_loggedin/>} />} />
