@@ -17,7 +17,7 @@ GET http://localhost:5097/api/v1/Login/IsAdminLoggedIn
 GET http://localhost:5097/api/v1/events
 
 #### get one event
-
+GET http://localhost:5097/api/v1/events/123457
 #### create event
 POST http://localhost:5097/api/v1/events/create
 Content-Type: application/json
@@ -81,7 +81,7 @@ POST http://localhost:5097/api/v1/attendance/attend
 Content-Type: application/json
 
 {
-    "UserId" : 2,
+    "UserId" : 3,
     "EventId" : 123457
 }
 
@@ -106,3 +106,22 @@ Content-Type: application/json
   "currentEventId": 67890,
   "newEventId": 12345
 }
+
+####
+POST http://localhost:5097/api/v1/attendance/event/123457/review
+Content-Type: application/json
+
+{
+  "feedback": "Great event! Learned a lot.",
+  "rating": 5
+}
+
+####
+POST http://localhost:5097/api/v1/attendance/workdays
+Content-Type: application/json
+
+{
+  "NewDays": "ma,di,wo,do"
+}
+
+

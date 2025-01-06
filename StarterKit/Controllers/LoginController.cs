@@ -18,55 +18,59 @@ public class LoginController : Controller
         _loginService = loginService;
     }
 
-[HttpPost("Login")]
-public async Task<IActionResult> Login([FromBody] LoginBody loginBody)
-{
-    LoginStatus status = await _loginService.CheckPassword(loginBody.Username, loginBody.Password);
+    // LoginController.cs
 
-    if (status == LoginStatus.IncorrectUsername)
+    [HttpPost("Login")]
+    public async Task<IActionResult> Login([FromBody] LoginBody loginBody)
     {
-        return Unauthorized("Incorrect username");
-    }
+        LoginStatus status = await _loginService.CheckPassword(loginBody.Username, loginBody.Password);
 
-    if (status == LoginStatus.IncorrectPassword)
-    {
-        return Unauthorized("Incorrect password");
-    }
-
-    if (status == LoginStatus.Success)
-    {
-        bool isAdmin = _loginService.IsAdmin(loginBody.Username);
-        
-        // Get UserId using the new method
-        int? userId = await _loginService.GetUserIdByUsername(loginBody.Username);
-        if (userId.HasValue)
+        if (status == LoginStatus.IncorrectUsername)
         {
-            // Set session values
-            HttpContext.Session.SetString("Username", loginBody.Username);
-            HttpContext.Session.SetInt32("UserId", userId.Value);
-            HttpContext.Session.SetBool("IsAdmin", isAdmin);
+            return Unauthorized("Incorrect username");
+        }
 
-            // Optionally, create a cookie with the username
-            var cookieOptions = new CookieOptions
+        if (status == LoginStatus.IncorrectPassword)
+        {
+            return Unauthorized("Incorrect password");
+        }
+
+        if (status == LoginStatus.Success)
+        {
+            bool isAdmin = _loginService.IsAdmin(loginBody.Username);
+
+            // Get UserId using the new method
+            int? userId = await _loginService.GetUserIdByUsername(loginBody.Username);
+            if (userId.HasValue)
             {
-                HttpOnly = true,  // Make cookie HTTPOnly for security
-                Secure = true,    // Only send cookie over HTTPS
-                SameSite = SameSiteMode.Strict,
-                Expires = DateTime.Now.AddHours(1)  // Expire in 1 hour (or customize as needed)
-            };
+                // Set session values
+                HttpContext.Session.SetString("Username", loginBody.Username);
+                HttpContext.Session.SetInt32("UserId", userId.Value);
+                HttpContext.Session.SetBool("IsAdmin", isAdmin);
 
-            Response.Cookies.Append("authToken", "some_secure_token_here", cookieOptions);  // You can store a session or JWT token here if desired
+                // Optionally, create a cookie with the username
+                var cookieOptions = new CookieOptions
+                {
+                    HttpOnly = true,  // Make cookie HTTPOnly for security
+                    Secure = true,    // Only send cookie over HTTPS
+                    SameSite = SameSiteMode.Strict,
+                    Expires = DateTime.Now.AddHours(1)  // Expire in 1 hour (or customize as needed)
+                };
 
-            return Ok($"Log in successful for {loginBody.Username}");
+                Response.Cookies.Append("UserId", userId.ToString(), cookieOptions); // Store UserId in cookie
+
+                return Ok($"Log in successful for {loginBody.Username}");
+            }
+            else
+            {
+                return Unauthorized("User ID could not be retrieved.");
+            }
         }
-        else
-        {
-            return Unauthorized("User ID could not be retrieved.");
-        }
+
+        return Unauthorized("Unknown error");
     }
 
-    return Unauthorized("Unknown error");
-}
+
 
 
     [HttpGet("IsAdminLoggedIn")]
