@@ -1,28 +1,25 @@
 import React, { useState, useEffect } from "react";
 
-// Helper function to manage workdays selection
 const workdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
 
 const ChangeWorkdaysPage: React.FC = () => {
-  const [selectedDays, setSelectedDays] = useState<string[]>([]); // To store selected workdays
-  const [message, setMessage] = useState<string>(""); // To store messages (success or error)
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false); // To track if user is logged in
-  const [loading, setLoading] = useState<boolean>(true); // To handle loading state
+  const [selectedDays, setSelectedDays] = useState<string[]>([]);
+  const [message, setMessage] = useState<string>("");
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
 
-  // Check login status and retrieve token
   useEffect(() => {
-    const authToken = localStorage.getItem("authToken"); // Retrieve the token from localStorage
+    const authToken = localStorage.getItem("authToken");
     console.log("AuthToken retrieved from localStorage:", authToken);
 
     if (authToken) {
-      setIsLoggedIn(true); // Mark user as logged in
+      setIsLoggedIn(true);
     } else {
       setIsLoggedIn(false);
     }
-    setLoading(false); // Stop the loading indicator
+    setLoading(false);
   }, []);
 
-  // Handle checkbox change (workday selection)
   const handleDayChange = (day: string) => {
     setSelectedDays((prevSelectedDays) =>
       prevSelectedDays.includes(day)
@@ -31,40 +28,39 @@ const ChangeWorkdaysPage: React.FC = () => {
     );
   };
 
-  // Submit selected workdays to the backend
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-  
+
     if (selectedDays.length === 0) {
       setMessage("Please select at least one workday.");
       return;
     }
-  
-    const authToken = localStorage.getItem("authToken"); // Retrieve the token again
+
+    const authToken = localStorage.getItem("authToken");
     if (!authToken) {
       setMessage("You need to log in to update workdays.");
       return;
     }
-  
-    const newWorkdays = selectedDays.join(", "); // Join selected days into a string
-  
+
+    const newWorkdays = selectedDays.join(", ");
+
     try {
       const response = await fetch("/api/v1/attendance/workdays", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${authToken}`, // Include the token for authentication
+          Authorization: `Bearer ${authToken}`,
         },
         body: JSON.stringify({
-          NewDays: newWorkdays, // Send the selected workdays as a string
+          NewDays: newWorkdays,
         }),
       });
-  
+
       if (response.ok) {
         setMessage("Workdays updated successfully.");
         setTimeout(() => {
-          window.location.href = "/user"; // Redirect to /user after 2 seconds
-        }, 2000); // Adjust delay as needed
+          window.location.href = "/user";
+        }, 2000);
       } else {
         const errorData = await response.json();
         setMessage(errorData.message || "Failed to update workdays.");
@@ -74,30 +70,91 @@ const ChangeWorkdaysPage: React.FC = () => {
       console.error("Error:", error);
     }
   };
-  
 
-  // If still loading, show a spinner or message
   if (loading) {
-    return <p>Loading...</p>;
+    return <p style={{ textAlign: "center", marginTop: "2rem" }}>Loading...</p>;
   }
 
-  // If user is not logged in, show the message
   if (!isLoggedIn) {
-    return <p>You must be logged in to update workdays.</p>;
+    return (
+      <p style={{ textAlign: "center", marginTop: "2rem" }}>
+        You must be logged in to update workdays.
+      </p>
+    );
   }
+
+  const styles: { [key: string]: React.CSSProperties } = {
+    container: {
+      maxWidth: "600px",
+      margin: "2rem auto",
+      padding: "2rem",
+      borderRadius: "8px",
+      backgroundColor: "#fff",
+      boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+      fontFamily: "Arial, sans-serif",
+    },
+    title: {
+      fontSize: "1.8rem",
+      color: "#202124",
+      textAlign: "center",
+      marginBottom: "1rem",
+    },
+    message: {
+      fontSize: "1rem",
+      color: message.includes("successfully") ? "green" : "red",
+      textAlign: "center",
+      marginBottom: "1rem",
+    },
+    checkboxContainer: {
+      display: "grid",
+      gridTemplateColumns: "1fr 1fr",
+      gap: "0.5rem",
+      marginBottom: "1rem",
+    },
+    checkboxItem: {
+      display: "flex",
+      alignItems: "center",
+    },
+    label: {
+      marginLeft: "0.5rem",
+      fontSize: "1rem",
+      color: "#5f6368",
+    },
+    button: {
+      width: "100%",
+      padding: "0.8rem",
+      fontSize: "1rem",
+      color: "#fff",
+      backgroundColor: "#4285F4",
+      border: "none",
+      borderRadius: "4px",
+      cursor: "pointer",
+      textAlign: "center",
+      transition: "background-color 0.3s ease",
+    },
+    buttonHover: {
+      backgroundColor: "#357ae8",
+    },
+    backButton: {
+      marginTop: "1rem",
+      width: "100%",
+      textAlign: "center",
+      textDecoration: "none",
+      fontSize: "1rem",
+      color: "#4285F4",
+      cursor: "pointer",
+    },
+  };
 
   return (
-    <div>
-      <h1>Change Workdays</h1>
-
-      {/* Display success/error message */}
-      {message && <p>{message}</p>}
-
+    <div style={styles.container}>
+      <h1 style={styles.title}>Change Workdays</h1>
+      {message && <p style={styles.message}>{message}</p>}
       <form onSubmit={handleSubmit}>
-        <h3>Select Your Workdays</h3>
-        <div>
+        <h3 style={styles.title}>Select Your Workdays</h3>
+        <div style={styles.checkboxContainer}>
           {workdays.map((day) => (
-            <div key={day}>
+            <div style={styles.checkboxItem} key={day}>
               <input
                 type="checkbox"
                 id={day}
@@ -106,17 +163,23 @@ const ChangeWorkdaysPage: React.FC = () => {
                 checked={selectedDays.includes(day)}
                 onChange={() => handleDayChange(day)}
               />
-              <label htmlFor={day}>{day}</label>
+              <label htmlFor={day} style={styles.label}>
+                {day}
+              </label>
             </div>
           ))}
         </div>
-
-        <button type="submit">Submit</button>
+        <button
+          type="submit"
+          style={styles.button}
+          onMouseOver={(e) => (e.currentTarget.style.backgroundColor = styles.buttonHover.backgroundColor!)}
+          onMouseOut={(e) => (e.currentTarget.style.backgroundColor = styles.button.backgroundColor!)}
+        >
+          Submit
+        </button>
       </form>
-
-      {/* Back Button */}
-      <a href="/user">
-        <button>Back</button>
+      <a href="/user" style={styles.backButton}>
+        Back
       </a>
     </div>
   );

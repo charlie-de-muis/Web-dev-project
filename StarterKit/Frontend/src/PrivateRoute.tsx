@@ -8,7 +8,7 @@ interface PrivateRouteProps {
 
 const PrivateRoute: React.FC<PrivateRouteProps> = ({ element }) => {
   // Check if the user is authenticated
-  const isAuthenticated = localStorage.getItem("authToken"); // Replace with your actual authentication check
+  const isAuthenticated = localStorage.getItem("authToken"); 
 
   if (!isAuthenticated) {
     // Redirect to login if not authenticated
@@ -16,7 +16,7 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ element }) => {
   }
 
   // Render the protected route if authenticated
-  return <>{element}</>; // Wrap the element directly here
+  return <>{element}</>; 
 };
 
 export default PrivateRoute;

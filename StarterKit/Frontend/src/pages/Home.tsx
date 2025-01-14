@@ -8,12 +8,12 @@ export default function Home() {
       alignItems: 'center',
       justifyContent: 'center',
       height: '100vh',
-      backgroundColor: '#f9f9f9', // Subtle off-white background
+      backgroundColor: '#f9f9f9', 
       fontFamily: 'Arial, sans-serif',
     } as React.CSSProperties,
     title: {
       fontSize: '2.5rem',
-      color: '#202124', // Google's dark text color
+      color: '#202124',
       marginBottom: '2rem',
     } as React.CSSProperties,
     buttonContainer: {
@@ -27,14 +27,14 @@ export default function Home() {
       padding: '0.8rem 1.5rem',
       fontSize: '1rem',
       color: '#fff',
-      backgroundColor: '#4285F4', // Google's blue
+      backgroundColor: '#4285F4', 
       border: 'none',
       borderRadius: '4px',
       cursor: 'pointer',
       transition: 'background-color 0.3s ease',
     } as React.CSSProperties,
     buttonHover: {
-      backgroundColor: '#357ae8', // Slightly darker blue for hover
+      backgroundColor: '#357ae8', 
     },
   };
 

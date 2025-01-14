@@ -57,6 +57,9 @@ const App: React.FC = () => {
             <Route 
                 path="/admin/attendees/:eventId" 
                 element={<PrivateRoute element={<AttendeesList />} />} />
+            <Route
+                path="/user/attending-events"
+                element={<PrivateRoute element={<HomePage />} />} />
 
         </Routes>
     );

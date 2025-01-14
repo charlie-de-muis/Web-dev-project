@@ -10,7 +10,7 @@ const Logout: React.FC = () => {
         // Call the logout API
         await fetch("http://localhost:5097/api/v1/Login/Logout", {
           method: "GET",
-          credentials: "include",  // Ensure session cookies are included if needed
+          credentials: "include", 
         });
 
         // Clear auth data from localStorage
