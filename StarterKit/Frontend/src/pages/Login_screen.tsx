@@ -44,7 +44,7 @@ const LoginScreen: React.FC = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(loginPayload),
-        credentials: "include", // Ensure that cookies are included in requests
+        credentials: "include", 
       });
       
 
@@ -75,6 +75,7 @@ const LoginScreen: React.FC = () => {
     }
   };
 
+  // styling
   const styles: { [key: string]: React.CSSProperties } = {
     container: {
       display: "flex",

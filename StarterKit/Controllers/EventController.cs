@@ -146,10 +146,16 @@ public class EventController : Controller
     }
 
     [HttpGet("{id}/review")]
-    public async Task<ActionResult<int>> GetReview(int id)
+    public async Task<ActionResult<double>> GetReview(int id)
     {
-        var eventitem = await _context.Event_Attendance.FirstOrDefaultAsync(e => e.Event.EventId == id);
+        List<int> reviews = new();
 
-        return Ok(eventitem.Rating);
+        reviews = _context.Event_Attendance.Where(e => e.Event.EventId == id).Select(e => e.Rating).ToList();
+        if (reviews == null)
+        {
+            return Ok("No reviews found");
+        }
+        double av = reviews.Sum() / reviews.Count();
+        return Ok(av);
     }
 }

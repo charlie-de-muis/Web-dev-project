@@ -237,6 +237,43 @@ public class AttendanceController : ControllerBase
         return Ok("Review submitted successfully.");
     }
 
+
+    // New GET endpoint to retrieve events attended by the logged-in user
+    [Authorize]
+    [HttpGet]
+    [Route("user/attending-events")]
+    public async Task<IActionResult> GetAttendingEvents()
+    {
+        // Check if the user is logged in
+        if (!User.Identity.IsAuthenticated)
+        {
+            return Unauthorized();
+        }
+
+        // Get the logged-in user's ID from claims
+        var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == "UserId")?.Value;
+        if (userIdClaim == null || !int.TryParse(userIdClaim, out var userId))
+        {
+            return BadRequest("Unable to identify the logged-in user.");
+        }
+
+        // Fetch the events the user is attending
+        var attendingEvents = await _dbContext.Event_Attendance
+            .Where(ea => ea.User.UserId == userId)
+            .Include(ea => ea.Event) // Include event information
+            .Select(ea => new
+            {
+                ea.Event.EventId,
+                ea.Event.Title,
+                ea.Event.EventDate,
+                ea.Event.Description
+            })
+            .ToListAsync();
+
+        return Ok(attendingEvents);
+    }
+
+
     public class ReviewRequest
     {
         public int Rating { get; set; }
